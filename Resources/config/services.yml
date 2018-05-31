@@ -1,0 +1,7 @@
+services:
+    fm.data_api:
+        class: MSDev\FileMakerDataAPI\Service\FileMakerDataAPI
+        arguments:
+            - '%env(DATABASE_HOST)%'
+        public: true
+    MSDev\FileMakerDataAPI\Service\FileMakerDataAPI: '@fm.data_api'
