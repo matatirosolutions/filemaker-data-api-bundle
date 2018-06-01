@@ -1,7 +1,19 @@
 services:
     fm.data_api:
-        class: MSDev\FileMakerDataAPI\Service\FileMakerDataAPI
+        class: MSDev\FileMakerDataAPIBundle\Service\FileMakerDataAPI
         arguments:
+            - '@doctrine.orm.entity_manager'
+            - '@session'
             - '%env(DATABASE_HOST)%'
+            - '%env(DATABASE_DB)%'
+            - '%env(DATABASE_USERNAME)%'
+            - '%env(DATABASE_PASSWORD)%'
         public: true
-    MSDev\FileMakerDataAPI\Service\FileMakerDataAPI: '@fm.data_api'
+    MSDev\FileMakerDataAPIBundle\Service\FileMakerDataAPI: '@fm.data_api'
+
+    fm.translation_export:
+        class: MSDev\FileMakerDataAPIBundle\Command\TranslationExportCommand
+        arguments:
+            - '@fm.data_api'
+        tags:
+            - { name: console.command }

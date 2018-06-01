@@ -24,7 +24,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('file_maker_data_api_bundle');
+        $rootNode = $treeBuilder->root('file_maker_data_api');
         $rootNode
             ->children()
                 ->scalarNode('valuelist_layout')

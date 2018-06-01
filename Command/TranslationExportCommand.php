@@ -1,7 +1,8 @@
 <?php
 
-namespace MSDev\DoctrineDataAPIBundle\Command;
+namespace MSDev\FileMakerDataAPIBundle\Command;
 
+use MSDev\FileMakerDataAPIBundle\Service\FileMakerDataAPI;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -9,10 +10,17 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\DependencyInjection\Exception\InvalidArgumentException;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
-use MSDev\DoctrineFileMakerDriverBundle\Entity\WebContent;
 
 class TranslationExportCommand extends ContainerAwareCommand
 {
+    /** @var FileMakerDataAPI */
+    protected $fmAPI;
+
+    public function __construct(FileMakerDataAPI $fileMakerDataAPI, ?string $name = null)
+    {
+        $this->fmAPI = $fileMakerDataAPI;
+        parent::__construct($name);
+    }
 
     protected $languages = [];
 
@@ -58,7 +66,7 @@ class TranslationExportCommand extends ContainerAwareCommand
     {
         $config = false;
         try {
-            $config = $this->getContainer()->getParameter('doctrine_file_maker_driver.javascript_translations');
+            $config = $this->getContainer()->getParameter('file_maker_data_api.javascript_translations');
         } catch(InvalidArgumentException $e) { }
 
         if(!$config) {
@@ -66,7 +74,7 @@ class TranslationExportCommand extends ContainerAwareCommand
                 "<comment>If you wish to use translations in JavaScript please install the ",
                 "    BazingaJsTranslationBundle",
                 "(composer require willdurand/js-translation-bundle) and set config value ",
-                "    doctrine_file_maker_driver.javascript_translations",
+                "    file_maker_data_api.javascript_translations",
                 "to true</comment>"]);
             return;
         }
@@ -318,7 +326,7 @@ class TranslationExportCommand extends ContainerAwareCommand
     {
         $root = $this->getContainer()->get('kernel')->getRootdir();
 
-        return $root.'/../vendor/matatirosoln/doctrine-filemaker-driver-bundle/Resources/translations';
+        return $root.'/../vendor/matatirosoln/filemaker-data-api-bundle/Resources/translations';
     }
 
     /**
@@ -326,9 +334,7 @@ class TranslationExportCommand extends ContainerAwareCommand
      */
     private function loadTextFromDB()
     {
-        $em = $this->getContainer()->get('doctrine');
-        return $em->getRepository('DoctrineFileMakerDriverBundle:WebContent')
-            ->findAll();
+        return $this->fmAPI->findAll('WebContent', '\MSDev\FileMakerDataAPIBundle\Entity\WebContent');
     }
 
 }
