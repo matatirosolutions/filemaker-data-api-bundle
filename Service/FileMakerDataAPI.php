@@ -150,16 +150,12 @@ class FileMakerDataAPI
                 return [];
             }
 
-            // if the token has expired or is invalid then the most likely response is
-            // a layout missing (go figure)
-            if(105 == $content->messages[0]->code)
-            {
-                if(!$this->retried) {
-                    $this->retried = true;
-                    $this->session->set('fm-data-api-token', false);
-                    $this->setOrFetchToken($this->session);
-                    $this->performFMRequest($method, $uri, $options);
-                }
+            // if the token has expired or is invalid then in theory 952 will come back
+            // but sometimes you get 105 missing layout (go figure), so try a token refresh
+            if(in_array($content->messages[0]->code, [105, 952]) && !$this->retried) {
+                $this->retried = true;
+                $this->fetchToken($this->session);
+                $this->performFMRequest($method, $uri, $options);
             }
 
             throw new QueryException($content->messages[0]->message, $content->messages[0]->code);
